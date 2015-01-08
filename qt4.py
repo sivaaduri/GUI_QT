@@ -1,7 +1,7 @@
 from PyQt4 import QtCore, QtGui
 import sys
 import simple_rc
-
+from gauge import AnalogClock
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -38,70 +38,98 @@ class MainWindow(QtGui.QMainWindow):
 
     def Motorcontrol(self):
         groupBox = QtGui.QGroupBox("Motorcontrol")
-
-        IC1 = QtGui.QPushButton("&Hypersonic")
-        IC2 = QtGui.QPushButton("Bridge Driver")
-        IC3 = QtGui.QPushButton("Aurix")
-
-
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(IC1)
-        vbox.addWidget(IC2)
-        #vbox.addWidget(IC3)
-        vbox.addStretch(2)
+        clock=AnalogClock()
+        vbox=QtGui.QVBoxLayout()
+        vbox.addWidget(clock)
         groupBox.setLayout(vbox)
+
+
+        
         return groupBox
     def Ics(self):
         groupBox = QtGui.QGroupBox("IC's")
 
-        IC1 = QtGui.QPushButton("&Hypersonic")
-        IC2 = QtGui.QPushButton("Bridge Driver")
-        IC3 = QtGui.QPushButton("Aurix")
-        
+        IC1 = QtGui.QPushButton("   ")
+        IC2 = QtGui.QPushButton("   ")
+        IC3 = QtGui.QPushButton("   ")
+        title1 = QtGui.QLabel("Hypersonic")
+        title2 = QtGui.QLabel("Bridge Driver")
+        title3 = QtGui.QLabel("Aurix")
+        title4 = QtGui.QLabel("      ")
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(IC1)
-        vbox.addWidget(IC2)
-        vbox.addWidget(IC3)
-        vbox.addStretch(2)
-        groupBox.setLayout(vbox)
+        QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
+        IC1.setToolTip('Click to go view Hypersonic')
+        IC1.setStyleSheet("background-image:url(:/images/powersupply.png)")
+        IC1.setFlat(True)
+        IC1.setAutoFillBackground(True)
+        IC1.setFixedWidth(62)
+        IC1.setFixedHeight(62)
+        IC2.setToolTip('Click to go view Bridge Driver')
+        IC2.setStyleSheet("background-image:url(:/images/bridge.png)")
+        IC2.setFlat(True)
+        IC2.setAutoFillBackground(True)
+        IC2.setFixedWidth(62)
+        IC2.setFixedHeight(62)
+        IC3.setToolTip('Click to go view Bridge Driver')
+        IC3.setStyleSheet("background-image:url(:/images/aurix.tif)")
+        IC3.setFlat(True)
+        IC3.setAutoFillBackground(True)
+        IC3.setFixedWidth(62)
+        IC3.setFixedHeight(62)
+
+
+        group=QtGui.QGridLayout()
+        group.addWidget(title1,1,0)
+        group.addWidget(title2,2,0)
+        group.addWidget(title3,3,0)
+        group.addWidget(IC1,1,1)
+        group.addWidget(IC2,2,1)
+        group.addWidget(IC3,3,1)
+        group.addWidget(title4,1,2)
+        groupBox.setLayout(group)
 
         return groupBox
     def Sensors(self):
         groupBox = QtGui.QGroupBox("Sensors")
 
-        sensor1 = QtGui.QPushButton("Ang")
-        sensor2 = QtGui.QPushButton("Torque Sensor")
-        title = QtGui.QLabel("Angle sensor")
-        sensor1.resize(10,10)
-        sensor2.resize(10,10)
+        sensor1 = QtGui.QPushButton("  ")
+        sensor2 = QtGui.QPushButton("  ")
+        title1 = QtGui.QLabel("Angle sensor")
+        title2 = QtGui.QLabel("Torque sensor")
+        title3 = QtGui.QLabel("         ")
         QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
         sensor1.setToolTip('Click to go view Angle sensor data')
         sensor1.setStyleSheet("background-image:url(:/images/Ang.png)")
-        layout = QtGui.QFormLayout()
-        layout.addRow(QtGui.QLabel("Angle Sensor"), sensor1)
-        layout.addRow(QtGui.QLabel("Torque Sensor"), sensor2)
-        layout.addRow(QtGui.QLabel("Line 3:"), QtGui.QSpinBox())
-        groupBox.setLayout(layout)
+        sensor1.setFlat(True)
+        sensor1.setAutoFillBackground(True)
+        sensor1.setFixedWidth(62)
+        sensor1.setFixedHeight(62)
+        sensor2.setToolTip('Click to go view Torque sensor data')
+        sensor2.setStyleSheet("background-image:url(:/images/torque.png)")
+        sensor2.setFlat(True)
+        sensor2.setAutoFillBackground(True)
+        sensor2.setFixedWidth(62)
+        sensor2.setFixedHeight(62)
+        group=QtGui.QGridLayout()
+        group.addWidget(title1,1,0)
+        group.addWidget(title2,2,0)
+        group.addWidget(title3,1,2)
+        group.addWidget(sensor1,1,1)
+        group.addWidget(sensor2,2,1)
+        groupBox.setLayout(group)
 
         return groupBox
     def Commandline(self):
         groupBox = QtGui.QGroupBox("Commandline")
 
-        sensor1 = QtGui.QPushButton("&Angle Sensor")
-        sensor2 = QtGui.QPushButton("Torque Sensor")
-        sensor1.resize(70,70)
-        sensor2.resize(70,70)
-        QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        sensor1.setToolTip('Click to go view Angle sensor data')
-        sensor1.setStyleSheet("background-image:url(:/images/Ang.png)")
+        title = QtGui.QLabel("Please Enter Commands")
+        text = QtGui.QTextEdit()
 
 
-        vbox = QtGui.QVBoxLayout()
-        vbox.addWidget(sensor1)
-        vbox.addWidget(sensor2)
-        vbox.addStretch(1)
-        groupBox.setLayout(vbox)
+        grid = QtGui.QGridLayout()
+        grid.addWidget(title,1,0)
+        grid.addWidget(text,2,0,2,2)
+        groupBox.setLayout(grid)
         return groupBox         
 
     def statusbr(self,event,d):

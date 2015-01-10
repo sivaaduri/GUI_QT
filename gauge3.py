@@ -42,6 +42,7 @@ class Example(QtGui.QWidget):
             s="error loading image"
             print sd
         print self.size()
+        print transform.m11(),transform.m12(),transform.m13(),transform.m21(),transform.m22(),transform.m23(),transform.m31(),transform.m32(),transform.m33()
         self.image= self.image.transformed(transform)
         self.qp.drawImage(target, self.image,source)
         print self.image.trueMatrix

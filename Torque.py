@@ -9,7 +9,6 @@ class Gauge(QtGui.QWidget):
     
     def __init__(self):
         super(Gauge, self).__init__()
-        self.resize(200, 200)
         self.qp = QtGui.QPainter()
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update)
@@ -39,43 +38,48 @@ class Gauge(QtGui.QWidget):
         QtCore.QPoint(-3, 5),
         QtCore.QPoint(0, -self.size().height()/2+17)])
         self.qp.rotate(self.angle)
-        self.qp.drawConvexPolygon(Hand)
+        
     
 
     def drawouter(self):
         color = QtGui.QColor(255, 0, 0)
         self.qp.setPen(color)
         self.qp.drawPoint(self.size().width()/2, self.size().height()/2)
-        color = QtGui.QColor(0, 0, 0)
+        color = QtGui.QColor(104,109,105,88)
         self.qp.setPen(color)
         radius = min(self.size().width()/2.0, self.size().height()/2.0)
-        target=QtCore.QRectF(self.size().width()/2, self.size().height()/2, radius, radius)
+        target=QtCore.QRectF(15.0-radius,15.0-radius, 2*(radius-15.0), 2*(radius-15.0))
         centre=QtCore.QPointF(self.size().width()/2, self.size().height()/2)
+        new_centre=QtCore.QPointF(0.0, 0.0)
         print self.size()
-        self.qp.setBrush(QtGui.QColor(235, 235, 245,160))
+        self.qp.setBrush(color)
         self.qp.drawEllipse(centre, radius-5, radius-5)
-        color = QtGui.QColor(207,207,209)
+        color = QtGui.QColor(0,0, 0,160)
         self.qp.setPen(color)
-        self.qp.setBrush(QtGui.QColor(207,207,209,160))
-        self.qp.drawEllipse(centre, radius-10.0, radius-10.0)
-        color = QtGui.QColor(235, 235, 245)
-        self.qp.setPen(color)
-        self.qp.setBrush(QtGui.QColor(235, 235, 245,160))
+        self.qp.setBrush(QtGui.QColor(color))
         self.qp.drawEllipse(centre, radius-15.0, radius-15.0)
         self.qp.translate(centre)
+        color = QtGui.QColor(37,149,255)
+        self.qp.setPen(color)
+        self.qp.setBrush(QtGui.QColor(color))
+        self.qp.drawPie(target,0,90*16)
+        color = QtGui.QColor(0, 0, 0,160)
+        self.qp.setPen(color)
+        self.qp.setBrush(QtGui.QColor(color))
+        self.qp.drawEllipse(new_centre, radius-45.0, radius-45.0)
         color = QtGui.QColor(0,0,0)
         self.qp.setPen(color)
         self.qp.setBrush(QtGui.QColor(color))
-        for i in range (1,13):
-            self.qp.rotate(30)
+        w=[5,10,15,0,-15,-10,-5,0]
+        
+        for i in w:
+            self.qp.rotate(45)
             self.qp.setFont(QtGui.QFont('Decorative', min(self.size().width(),self.size().height())/30))
-            self.qp.drawRect(-self.size().width()/100.0,-self.size().height()/2.0+17,self.size().width()/80,self.size().height()/20)
-            s=str(30*i)
-            sp=QtCore.QPointF(-self.size().width()/100.0, -self.size().height()/2.0+17+self.size().height()/20+14)
-            self.qp.drawText(sp,s)
-        for i in range (1,73):
-            self.qp.rotate(5)
-            self.qp.drawRect(-self.size().width()/100.0,-self.size().height()/2.0+17,self.size().width()/120,self.size().height()/80)   
+            s=str((i))
+            sp=QtCore.QPointF(-self.size().width()/100.0, -self.size().height()/2.0+17+self.size().height()/20+34)
+            color = QtGui.QColor(255,255,255)
+            self.qp.setPen(color)
+            self.qp.drawText(sp,s)  
         
     def chanGe(self,angle):
         self.angle=angle

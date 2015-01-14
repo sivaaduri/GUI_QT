@@ -1,7 +1,12 @@
+import sip
+sip.setapi('QVariant', 2)
 from PyQt4 import QtCore, QtGui
 import sys
 import simple_rc
-from gauge import AnalogClock
+from gauge4 import Gauge
+from Angle_Sensor import Angle_Sensor
+from Torque1 import Torque_Sensor
+
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -38,7 +43,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def Motorcontrol(self):
         groupBox = QtGui.QGroupBox("Motorcontrol")
-        clock=AnalogClock()
+        clock=Gauge()
         vbox=QtGui.QVBoxLayout()
         vbox.addWidget(clock)
         groupBox.setLayout(vbox)
@@ -92,33 +97,40 @@ class MainWindow(QtGui.QMainWindow):
     def Sensors(self):
         groupBox = QtGui.QGroupBox("Sensors")
 
-        sensor1 = QtGui.QPushButton("  ")
-        sensor2 = QtGui.QPushButton("  ")
+        self.sensor1 = QtGui.QPushButton("  ")
+        self.sensor2 = QtGui.QPushButton("  ")
         title1 = QtGui.QLabel("Angle sensor")
         title2 = QtGui.QLabel("Torque sensor")
         title3 = QtGui.QLabel("         ")
         QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        sensor1.setToolTip('Click to go view Angle sensor data')
-        sensor1.setStyleSheet("background-image:url(:/images/Ang.png)")
-        sensor1.setFlat(True)
-        sensor1.setAutoFillBackground(True)
-        sensor1.setFixedWidth(62)
-        sensor1.setFixedHeight(62)
-        sensor2.setToolTip('Click to go view Torque sensor data')
-        sensor2.setStyleSheet("background-image:url(:/images/torque.png)")
-        sensor2.setFlat(True)
-        sensor2.setAutoFillBackground(True)
-        sensor2.setFixedWidth(62)
-        sensor2.setFixedHeight(62)
+        self.sensor1.setToolTip('Click to go view Angle sensor data')
+        self.sensor1.setStyleSheet("background-image:url(:/images/Ang.png)")
+        self.sensor1.setFlat(True)
+        self.sensor1.setAutoFillBackground(True)
+        self.sensor1.setFixedWidth(62)
+        self.sensor1.setFixedHeight(62)
+        self.sensor2.setToolTip('Click to go view Torque sensor data')
+        self.sensor2.setStyleSheet("background-image:url(:/images/torque.png)")
+        self.sensor2.setFlat(True)
+        self.sensor2.setAutoFillBackground(True)
+        self.sensor2.setFixedWidth(62)
+        self.sensor2.setFixedHeight(62)
         group=QtGui.QGridLayout()
         group.addWidget(title1,1,0)
         group.addWidget(title2,2,0)
         group.addWidget(title3,1,2)
-        group.addWidget(sensor1,1,1)
-        group.addWidget(sensor2,2,1)
+        group.addWidget(self.sensor1,1,1)
+        group.addWidget(self.sensor2,2,1)
         groupBox.setLayout(group)
-
+        self.sensor1.clicked.connect(self.ang1)
+        self.sensor2.clicked.connect(self.tor1)
         return groupBox
+    def ang1(self):
+        self.ann=Angle_Sensor()
+        self.ann.show()
+    def tor1(self):
+        self.tor=Torque_Sensor()
+        self.tor.show()
     def Commandline(self):
         groupBox = QtGui.QGroupBox("Commandline")
 

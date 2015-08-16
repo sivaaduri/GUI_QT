@@ -1,5 +1,5 @@
 import sys
-from PyQt4 import QtGui
+from PyQt4 import QtGui,QtCore
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
@@ -23,8 +23,8 @@ class PLot(QtGui.QWidget):
         self.toolbar = NavigationToolbar(self.canvas, self)
 
         # Just some button connected to `plot` method
-        self.button = QtGui.QPushButton('Plot')
-        self.button.clicked.connect(self.plot)
+        self.button = QtGui.QPushButton('Clear')
+        self.button.clicked.connect(self.clean)
 
         # set the layout
         layout = QtGui.QVBoxLayout()
@@ -32,23 +32,39 @@ class PLot(QtGui.QWidget):
         layout.addWidget(self.canvas)
         layout.addWidget(self.button)
         self.setLayout(layout)
+        self.data=[0]
+        timer = QtCore.QTimer(self)
+        timer.timeout.connect(self.update)
+        timer.start(100)
 
     def plot(self):
         ''' plot some random stuff '''
         # random data
-        data = [random.random() for i in range(10)]
+        #self.data = [random.random() for i in range(10)]
 
         # create an axis
-        ax = self.figure.add_subplot(111)
+        self.ax = self.figure.add_subplot(111)
 
         # discards the old graph
-        ax.hold(False)
+        self.ax.hold(False)
 
         # plot data
-        ax.plot(data, '*-')
+        #ax.plot(self.data, '-')
+        self.ax.plot(self.data)
 
         # refresh canvas
         self.canvas.draw()
+	
+    def label(self,xlabel,ylabel,title):
+        self.ax.ylabel('Torque_Value')
+        self.ax.xlabel('Samples')
+        self.ax.title('Torque_Sensor')
+    def datalog(self,data):
+        self.data.append(data)
+    def clean(self):
+        self.data=[0]
+    def update(self):
+        self.plot()
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

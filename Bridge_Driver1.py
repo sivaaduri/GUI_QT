@@ -1,0 +1,222 @@
+
+import sys
+from PyQt4 import QtGui, QtCore, Qt
+import simple_rc
+from numpy import *
+from math import cos,sin,radians
+from gauge5 import Gauge
+from plot import PLot
+from xlrd import open_workbook,cellname
+class Brigde_Driver(QtGui.QMainWindow):
+    def __init__(self):
+        super(Brigde_Driver, self).__init__()
+        self.resize(1000,700)
+        self.center()
+        self.wb = open_workbook('Book1.xlsx')
+        self.s = self.wb.sheet_by_index(0)
+        self.s1 = self.wb.sheet_by_index(1)
+        self.s2 = self.wb.sheet_by_index(2)
+        self.s3= self.wb.sheet_by_index(3)
+        
+        #print self.s.name,self.s.nrows,self.s.ncols,self.s1.name,self.s1.nrows,self.s1.ncols,self.s2.name,self.s2.nrows,self.s2.ncols
+        self.field=zeros([84,8,2],dtype="S20")
+        self.combo=[]
+        for i in xrange(84):
+            self.combo.append([]) 
+        self.combo.append([])
+        self.setWindowTitle('OIKOS DEMO BOARD')
+        self.setWindowIcon(QtGui.QIcon(':/images/icon.png'))
+        self.Registers_init()
+        self.r_addrs_init()
+        self.defaults_init()
+        self.fields_init()
+        self.setwin()
+        
+        
+        
+        
+        
+    def setwin(self):
+        self.widget = QtGui.QWidget()
+        self.setCentralWidget(self.widget)
+        self.mainlayout=QtGui.QVBoxLayout()
+        self.layout = QtGui.QVBoxLayout()
+        self.layout.addWidget(self.Commandline())
+        #self.layout.setColumnMinimumWidth(1,500)
+        self.mainlayout.addLayout(self.layout)
+        self.widget.setLayout(self.mainlayout)
+ 
+    def Commandline(self):
+        groupBox = QtGui.QGroupBox("Registers")
+        scroll = QtGui.QScrollArea()
+        #scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        #scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        title = QtGui.QLabel("Please Enter Commands")
+        self.text = list()
+        widget = QtGui.QWidget()
+        grid = QtGui.QVBoxLayout()
+        #grid.minimumHeightForWidth(10)
+        self.hbox=list()
+        rx=QtCore.QRegExp("(?:[0-9 a-f A-F]\\d{1},)*[0-9 a-f A-F]\\d{1}")
+        validator =  QtGui.QRegExpValidator(rx)
+        for i in xrange(self.s.nrows):
+                  x=self.Registers(i)
+                  y=self.r_addrs(i)
+                  title=QtGui.QLabel(x)
+                  title.setFixedWidth(300)
+                  title2=QtGui.QLabel(y)
+                  hbox=QtGui.QHBoxLayout()
+                  vbox=QtGui.QHBoxLayout()
+                  hbox.addWidget(title)
+                  hbox.addWidget(title2)
+                  z=self.how_many_bits(i)
+                  for k in xrange(z):
+                    self.combo[i].append(QtGui.QComboBox())
+                  for k in xrange(len(self.combo[i])):
+                    self.combo[i][k].setWindowTitle(x)
+                    self.combo[i][k].setMaxCount(2**8-1)
+                    
+                    if(2**(int(self.field[i][k][1]))<=0):
+                        print 2**(int(self.field[i][k][1])),"yes problem",int(self.field[i][k][1])
+                        raise SystemExit()
+                    for l in xrange((2**(int(self.field[i][k][1])))):
+                        self.combo[i][k].addItem(str(self.field[i][k][0])+" "+str(bin(l)))
+                        #print (int(self.field[i][k][1])),"so close", str(self.field[i][k][0])
+                    vbox.addWidget(self.combo[i][k])
+                  self.text.append(QtGui.QLineEdit())
+                  self.text[i].AutoNone=0
+                  self.text[i].setFixedHeight(30)
+                  self.text[i].setFixedWidth(70)
+                  self.text[i].setWindowTitle(x)
+                  self.text[i].setValidator(validator)
+                  self.text[i].setText(self.default(i))
+                  self.connect(self.text[i],Qt.SIGNAL("textChanged()"),self.reg_change)
+                  self.text[i].editingFinished.connect(self.reg_change)
+                  self.text[i].textEdited.connect(lambda: self.reg_change)
+                  self.text[i].returnPressed.connect(lambda: self.reg_change)
+                  for k in xrange(len(self.combo[i])):
+                    self.combo[i][k].currentIndexChanged.connect(self.combs)
+                  hbox.addWidget(self.text[i])
+                  grid.addLayout(hbox)
+                  grid.addLayout(vbox)
+        widget.setLayout(grid)
+        scroll.setWidget(widget)
+        vLayout = QtGui.QVBoxLayout(self)
+        vLayout.addWidget(scroll)
+        groupBox.setLayout(vLayout)
+        return groupBox         
+    
+    def reg_change(self):
+        sender = self.sender()
+        print str(sender.windowTitle())
+    def combs(self):
+        sender=self.sender()
+        s=str(sender.windowTitle())
+        for i in xrange(len(self.text)):
+            if(self.text[i].windowTitle()==s):
+              #print s,i,type(i)
+              break
+        z=self.how_many_bits(i)
+        d=int(self.combo2test(i),2)
+        print hex(d)
+        self.text[i].setText(QtCore.QString(hex(d)[2:4]))
+    
+    def combo2test(self,i):
+        z=self.how_many_bits(i)
+        s=0
+        s1=0
+        for j in xrange(z):
+            d=(bin(2**int(self.field[i][j][1])-1))
+            e=d[2::]
+            f=bin(((self.combo[i][j].currentIndex())<<(8-(len(e))-s1)))
+            
+            s=(s)+int(f,2)
+            #print f,bin(s),len(f),len(bin(s)[2::])
+            #print d,e,s1,j,bin(2**int(self.field[i][j][1])-1),int(self.combo[i][j].currentIndex()),(8-(len(e))-s1)
+            s1=len(e)+s1
+        #print bin(s),len(bin(s)[2::])
+        return bin(s)
+    def command(self,text):
+        self.text.setText(text)
+    def center(self):
+        
+        qr = self.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+       
+    def Registers_init(self):
+        self.reg=list()
+        for row_index in xrange(self.s1.nrows):
+            col_index=0
+            self.reg.append(self.s1.cell(rowx=row_index,colx=col_index).value)
+        return 1
+    def Registers(self,i):
+        return self.reg[i]
+    def r_addrs_init(self):
+        self.reg_addrs=list()
+        for row_index in xrange(self.s.nrows):
+            col_index=0
+            self.reg_addrs.append(self.s.cell(rowx=row_index,colx=col_index).value)
+        return 1
+    def r_addrs(self,i):
+        return self.reg_addrs[i]
+    def fields_init(self):
+        reg=0
+        for row_index in xrange(self.s2.nrows):
+            col_index=0
+            if((self.s2.cell(rowx=row_index,colx=col_index).value=="Field")):
+                j=0
+                row_index=row_index+1
+                self.field[reg][j]=str(self.s2.cell(rowx=row_index,colx=col_index).value)
+                self.field[reg][j][1]=self.num_bits((self.s2.cell(rowx=row_index,colx=col_index+1).value))
+                #print self.s2.cell(rowx=row_index,colx=col_index).value
+                while(self.s2.cell(rowx=row_index,colx=col_index).value!="Field"):
+                    row_index=row_index+1
+                    j=j+1
+                    if(  row_index==(self.s2.nrows)):
+                         break
+                    if( (self.s2.cell(rowx=row_index,colx=col_index).value=="Field")):
+                         row_index=row_index-1
+                         break
+                    #print self.s2.cell(rowx=row_index,colx=col_index).value,"I am here",j
+                    self.field[reg][j]=str(self.s2.cell(rowx=row_index,colx=col_index).value)
+                    self.field[reg][j][1]=self.num_bits((self.s2.cell(rowx=row_index,colx=col_index+1).value))
+                j=0
+                reg=reg+1
+                #print reg
+        #print (self.field)
+    def defaults_init(self):
+        self._default=list()
+        for row_index in xrange(self.s1.nrows):
+            col_index=0
+            self._default.append(self.s3.cell(rowx=row_index,colx=col_index).value)
+        return 1
+    def default(self,i):
+        return self._default[i]
+    def num_bits(self,bits):
+        c=':'
+        try:
+				if(bits.find(c)):
+					i=bits.find(c)
+					k=int(str(bits)[i-1])-int(str(bits)[i+1])+1
+					return k
+        except:
+            return 1
+    def how_many_bits(self,i):
+        k=0
+        for j in xrange(8):
+            if(self.field[i][j][0]):
+                k=k+1
+        return k
+def main():
+    
+    app = QtGui.QApplication(sys.argv)
+    ex = Brigde_Driver()
+    ex.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

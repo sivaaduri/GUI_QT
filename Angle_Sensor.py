@@ -17,6 +17,7 @@ class Angle_Sensor(QtGui.QMainWindow):
         self.createActions()
         self.setwin()
         
+        
     def setwin(self):
         self.widget = QtGui.QWidget()
         self.setCentralWidget(self.widget)
@@ -31,22 +32,26 @@ class Angle_Sensor(QtGui.QMainWindow):
         self.layout.setColumnMinimumWidth(1,500)
         self.mainlayout.addLayout(self.layout)
         self.widget.setLayout(self.mainlayout)
+        
 
     def Angle_Value(self):
         groupBox = QtGui.QGroupBox("Angle Value")
-        clock=Gauge()
+        self.clock=Gauge()
         vbox=QtGui.QVBoxLayout()
-        vbox.addWidget(clock)
+        vbox.addWidget(self.clock)
         groupBox.setLayout(vbox)
-
-
-        
         return groupBox
+    
+    def angle(self,angle):
+        self.anglee=angle
+        self.clock.chanGe(self.anglee)
+        self.plot.datalog(self.anglee)
     def Plot(self):
+        self.plot=PLot()
+        #self.plot.label("Angle_Value","samples","Angle_Sensor")
         groupBox = QtGui.QGroupBox("Plot")
-        plot=PLot()
         vbox=QtGui.QVBoxLayout()
-        vbox.addWidget(plot)
+        vbox.addWidget(self.plot)
         groupBox.setLayout(vbox)
         return groupBox
     def Sensors(self):
@@ -107,14 +112,15 @@ class Angle_Sensor(QtGui.QMainWindow):
  
     def closeEvent(self, event):
         
-        reply = QtGui.QMessageBox.question(self, 'Message',
+        """reply = QtGui.QMessageBox.question(self, 'Message',
             "Do you want to Disconnect and quit?", QtGui.QMessageBox.Yes | 
             QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 
         if reply == QtGui.QMessageBox.Yes:
             event.accept()
         else:
-            event.ignore()
+            event.ignore()"""
+        event.accept()
     def createActions(self):
         self.conn = QtGui.QAction(QtGui.QIcon(':/images/download.jpg'),"&Connect", self,
                 statusTip="Connect to a COM PORT", triggered=self.Connect)

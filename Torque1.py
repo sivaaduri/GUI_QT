@@ -1,11 +1,18 @@
 
 import sys
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui, QtCore,Qt
 import simple_rc
 from numpy import matrix
 from math import cos,sin,radians
 from gauge5 import Gauge
 from plot import PLot
+import pyqtgraph as pg
+import numpy as np
+import pyqtgraph.metaarray as metaarray
+from pyqtgraph.flowchart import Flowchart
+import pyqtgraph as pg
+import numpy as np
+import pyqtgraph.console
 class Torque_Sensor(QtGui.QMainWindow):
     def __init__(self):
         super(Torque_Sensor, self).__init__()
@@ -33,20 +40,34 @@ class Torque_Sensor(QtGui.QMainWindow):
         self.widget.setLayout(self.mainlayout)
 
     def Angle_Value(self):
-        groupBox = QtGui.QGroupBox("Angle Value")
-        clock=Gauge()
-        vbox=QtGui.QVBoxLayout()
-        vbox.addWidget(clock)
+        groupBox = QtGui.QGroupBox("Torque Value")
+        self.clock=Gauge()
+        #self.clock.setMinimum(-100)
+        #self.clock.setMaximum(100)
+        #self.clock.setValue(0)
+        #self.clock.setTextVisible(True)
+        #self.clock1=QtGui.QProgressBar()
+        #self.clock1.setInvertedAppearance(True)
+        """x=QtGui.QStyleOptionSlider()
+        x.orientation=QtCore.Qt.Vertical
+        self.clock.initStyleOption()"""
+        vbox=QtGui.QHBoxLayout()
+        vbox.addWidget(self.clock)
+        #vbox.addWidget(self.clock1)
         groupBox.setLayout(vbox)
-
-
-        
         return groupBox
+    
+    def angle(self,angle):
+        self.anglee=angle
+        #self.clock.chanGe(self.anglee)
+        self.plot.datalog(self.anglee)
+        self.command(str(self.anglee))
+ 
     def Plot(self):
         groupBox = QtGui.QGroupBox("Plot")
-        plot=PLot()
+        self.plot=PLot()
         vbox=QtGui.QVBoxLayout()
-        vbox.addWidget(plot)
+        vbox.addWidget(self.plot)
         groupBox.setLayout(vbox)
         return groupBox
     def Sensors(self):
@@ -82,15 +103,21 @@ class Torque_Sensor(QtGui.QMainWindow):
     def Commandline(self):
         groupBox = QtGui.QGroupBox("Commandline")
 
+        namespace = {'pg': pg, 'np': np}
+
+        ## initial text to display in the console
+        text = """
+        This is a console. The numpy and pyqtgraph modules have already been imported 
+        as 'np' and 'pg'.Please refer to angle_sensor value as Ang, torque_sensor as Tor """
+        c = pyqtgraph.console.ConsoleWidget(namespace=namespace, text=text)
         title = QtGui.QLabel("Please Enter Commands")
-        text = QtGui.QTextEdit()
-
-
-        grid = QtGui.QGridLayout()
-        grid.addWidget(title,1,0)
-        grid.addWidget(text,2,0,2,2)
+        grid = QtGui.QVBoxLayout()
+        grid.addWidget(c)
         groupBox.setLayout(grid)
         return groupBox         
+    
+    def command(self,text):
+        self.text.setText(text)
 
     def statusbr(self,event,d):
         if(d==0):
@@ -131,7 +158,7 @@ class Torque_Sensor(QtGui.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
         
-        
+
 def main():
     
     app = QtGui.QApplication(sys.argv)

@@ -10,16 +10,16 @@ class Gauge(QtGui.QWidget):
     def __init__(self):
         super(Gauge, self).__init__()
         self.qp = QtGui.QPainter()
+        self.initUI()
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update)
-        timer.start(1000)
-        self.initUI()
+        timer.start(10)
         
     def initUI(self):      
         
         self.image = QtGui.QImage()
         self.setWindowTitle('Gauge')
-        self.angle=0
+        self.angle=120
         self.show()
 
     def paintEvent(self, event):
@@ -51,7 +51,7 @@ class Gauge(QtGui.QWidget):
         target=QtCore.QRectF(15.0-radius,15.0-radius, 2*(radius-15.0), 2*(radius-15.0))
         centre=QtCore.QPointF(self.size().width()/2, self.size().height()/2)
         new_centre=QtCore.QPointF(0.0, 0.0)
-        print self.size()
+        #print self.size()
         self.qp.setBrush(color)
         self.qp.drawEllipse(centre, radius-5, radius-5)
         color = QtGui.QColor(0,0, 0,160)
@@ -62,7 +62,9 @@ class Gauge(QtGui.QWidget):
         color = QtGui.QColor(37,149,255)
         self.qp.setPen(color)
         self.qp.setBrush(QtGui.QColor(color))
-        self.qp.drawPie(target,0,90*16)
+        self.qp.rotate(-90)
+        self.qp.drawPie(target,0,-self.angle*16)
+        self.qp.rotate(90)
         color = QtGui.QColor(0, 0, 0,160)
         self.qp.setPen(color)
         self.qp.setBrush(QtGui.QColor(color))
@@ -82,6 +84,9 @@ class Gauge(QtGui.QWidget):
             self.qp.drawText(sp,s)  
         
     def chanGe(self,angle):
+        if((angle>48)&(angle>53)):
+            angle=50
+        angle=(angle-50)*180/40
         self.angle=angle
 
         """npx=[]

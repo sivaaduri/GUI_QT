@@ -13,7 +13,7 @@ class Gauge(QtGui.QWidget):
         self.qp = QtGui.QPainter()
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update)
-        timer.start(1000)
+        timer.start(10)
         self.initUI()
         
     def initUI(self):      
@@ -51,7 +51,7 @@ class Gauge(QtGui.QWidget):
         radius = min(self.size().width()/2.0, self.size().height()/2.0)
         target=QtCore.QRectF(self.size().width()/2, self.size().height()/2, radius, radius)
         centre=QtCore.QPointF(self.size().width()/2, self.size().height()/2)
-        print self.size()
+        #print self.size()
         self.qp.setBrush(QtGui.QColor(235, 235, 245,160))
         self.qp.drawEllipse(centre, radius-5, radius-5)
         color = QtGui.QColor(207,207,209)
